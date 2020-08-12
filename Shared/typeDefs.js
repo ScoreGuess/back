@@ -36,6 +36,7 @@ module.exports = gql`
   type Fixture {
     id: ID!
     status: FixtureStatus!
+    startDate: String!
     awayTeam: Team!
     homeTeam: Team!
     matchDay: Int!
@@ -77,7 +78,12 @@ module.exports = gql`
     teamDelete(id: ID!): Team
 
     "Adds a team to the competition"
-    fixtureCreate(awayTeamId: ID!, homeTeamId: ID!, day: Int): Fixture
+    fixtureCreate(
+      awayTeamId: ID!
+      homeTeamId: ID!
+      matchDay: Int
+      startDate: String!
+    ): Fixture
     "Updates the score of a fixture"
     fixtureUpdateScore(fixtureId: ID!, homeScore: Int, awayScore: Int): Fixture
 

@@ -46,7 +46,10 @@ const resolvers = {
 };
 
 const app = express();
-const server = new ApolloServer({ typeDefs, resolvers });
+const server = new ApolloServer({
+  typeDefs: typeDefs,
+  resolvers,
+});
 
 server.applyMiddleware({ app, path: "/", cors: true });
 exports.graphql = functions.https.onRequest(app);

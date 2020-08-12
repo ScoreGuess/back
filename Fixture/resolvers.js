@@ -19,7 +19,6 @@ const fixtureCreate = async (_, fixture) => {
   return await save("fixtures", {
     ...fixture,
     status: "PLANNED",
-    id: ref.key,
   });
 };
 
