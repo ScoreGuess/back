@@ -17,7 +17,6 @@ const fixtureSearch = async (_, { userId, matchDay }) => {
   const fixtures = await find("fixtures");
   const teams = await find("teams");
   const predictions = await find(`users/${userId}/predictions`);
-
   return fixtures
     .filter((fixture) => matchDay == null || matchDay === fixture.matchDay)
     .map((fixture) => {

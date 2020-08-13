@@ -94,7 +94,7 @@ module.exports = gql`
 
     "Adds a prediction"
     userCreatePrediction(
-      userId: ID!
+      userId: String!
       fixtureId: String!
       homeScore: Int!
       awayScore: Int!

@@ -82,7 +82,10 @@ const save = async (resourceType, resource) => {
 const find = async (resourceType) => {
   const snapshot = await admin.database().ref(resourceType).once("value");
   const resources = await snapshot.val();
-  return Object.keys(resources).map((key) => resources[key]);
+
+  return resources == null
+    ? []
+    : Object.keys(resources).map((key) => resources[key]);
 };
 
 module.exports = {
