@@ -66,7 +66,7 @@ module.exports = gql`
     """
 
     """
-    allUsers: [User!]!
+    user(userId: String!): User!
 
     allPredictions: [Prediction!]!
   }
@@ -88,7 +88,12 @@ module.exports = gql`
     fixtureUpdateScore(fixtureId: ID!, homeScore: Int, awayScore: Int): Fixture
 
     "Adds a user"
-    userCreate(firstName: String!, lastName: String!, email: String!): User
+    userCreate(
+      userId: String!
+      firstName: String!
+      lastName: String!
+      email: String!
+    ): User
 
     "Adds a prediction"
     predictionCreate(

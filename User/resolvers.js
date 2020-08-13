@@ -1,17 +1,19 @@
-const { find, save } = require("../Shared/db");
+const admin = require("firebase-admin");
+const { findOne } = require("../Shared/db");
 
 const userCreate = async (_, user) => {
-  const resource = await save("users", {
-    ...user,
-  });
-  return resource;
+  const ref = admin.database().ref("users");
+
+  await ref.child(user.id).set(user);
+
+  return user;
 };
 
-const userSearch = async () => {
-  return await find("users");
+const userRead = async (_, { userId }) => {
+  return await findOne("users", userId);
 };
 
 module.exports = {
   userCreate,
-  userSearch,
+  userRead,
 };

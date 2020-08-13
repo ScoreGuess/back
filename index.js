@@ -3,7 +3,7 @@ const functions = require("firebase-functions");
 const express = require("express");
 const { ApolloServer } = require("apollo-server-express");
 const serviceAccount = require("./credentials.json");
-const { userCreate, userSearch } = require("./User/resolvers");
+const { userCreate, userRead } = require("./User/resolvers");
 const {
   fixtureSearch,
   fixtureUpdateScore,
@@ -28,7 +28,7 @@ const resolvers = {
   Query: {
     allTeams: teamSearch,
     allFixtures: fixtureSearch,
-    allUsers: userSearch,
+    user: userRead,
   },
 
   Mutation: {

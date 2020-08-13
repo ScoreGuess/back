@@ -5,7 +5,17 @@ const admin = require("firebase-admin");
  * the name and signature of these functions are strongly inspired by mongo and mongoose
  * c.f. https://mongoosejs.com/docs/queries.html
  */
+const findOne = async (resourceType, resourceId) => {
+  // we first retrieve a resource like "/fixtures/-Mabcdefghijk"
+  const ref = admin.database().ref(`${resourceType}/${resourceId}`);
 
+  // then wait for the snapshot from the ref using value event
+  // we try to read the resource before removing it
+  // this way we can return the deleted resource from this resolver
+  // c.f. https://firebase.google.com/docs/database/admin/retrieve-data#value
+  const snapshot = await ref.once("value");
+  return snapshot.val();
+};
 /**
  * @param {string} resourceType - the resource type, could be fixtures or teams, etc...
  * @param {string} resourceId - the id of the resource
@@ -77,6 +87,7 @@ const find = async (resourceType) => {
 module.exports = {
   save,
   find,
+  findOne,
   findOneAndUpdate,
   findOneAndDelete,
 };
