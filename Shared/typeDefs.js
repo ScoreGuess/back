@@ -12,18 +12,13 @@ module.exports = gql`
     id: ID!
     shortName: String!
     longName: String!
-    logo: String
+    logo: String!
   }
 
   """
   Score represents the score of a fixture
   The score could be used while the fixture is in-progress or finished
   """
-  type Score {
-    homeScore: Int!
-    awayScore: Int!
-  }
-
   enum FixtureStatus {
     PLANNED
     IN_PROGRESS
@@ -40,35 +35,37 @@ module.exports = gql`
     awayTeam: Team!
     homeTeam: Team!
     matchDay: Int!
-    score: Score
+    homeScore: Int
+    awayScore: Int
+    prediction: Prediction
   }
 
   """
   Prediction represents a prediction
   """
   type Prediction {
-    id: ID!
-    user: User!
-    fixture: Fixture!
-    score: Score!
-    active: Boolean!
+    user: User
+    fixture: Fixture
+    homeScore: Int!
+    awayScore: Int!
   }
 
   type Query {
     allTeams: [Team!]!
 
+    fixture(fixtureId: String!, userId: String!): Fixture!
     """
     allFixtures queries all the fixtures of the competition.
     It accepts matchDay as an argument to filter fixtures on a specific matchDay
     """
-    allFixtures(matchDay: Int): [Fixture!]!
+    fixtures(matchDay: Int, userId: String!): [Fixture!]!
 
     """
 
     """
     user(userId: String!): User!
 
-    allPredictions: [Prediction!]!
+    predictions(userId: String!): [Prediction!]!
   }
 
   type Mutation {
@@ -96,9 +93,9 @@ module.exports = gql`
     ): User
 
     "Adds a prediction"
-    predictionCreate(
+    userCreatePrediction(
       userId: ID!
-      fixtureId: ID!
+      fixtureId: String!
       homeScore: Int!
       awayScore: Int!
     ): Prediction

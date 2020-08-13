@@ -73,6 +73,7 @@ const save = async (resourceType, resource) => {
   await ref.set(savedResource);
   return savedResource;
 };
+
 /**
  *
  * @param {String} resourceType

@@ -1,8 +1,22 @@
-const { save, find, findOneAndUpdate } = require("../Shared/db");
+const { save, find, findOne, findOneAndUpdate } = require("../Shared/db");
 
-const fixtureSearch = async (_, { matchDay }) => {
+const fixtureRead = async (_, { fixtureId, userId }) => {
+  const fixture = await findOne("fixtures", fixtureId);
+  const teams = await find("teams");
+
+  const prediction = await findOne(`users/${userId}/predictions/`, fixtureId);
+
+  return {
+    ...fixture,
+    prediction,
+    awayTeam: teams.find((t) => t.id === fixture.awayTeamId),
+    homeTeam: teams.find((t) => t.id === fixture.homeTeamId),
+  };
+};
+const fixtureSearch = async (_, { userId, matchDay }) => {
   const fixtures = await find("fixtures");
   const teams = await find("teams");
+  const predictions = await find(`users/${userId}/predictions`);
 
   return fixtures
     .filter((fixture) => matchDay == null || matchDay === fixture.matchDay)
@@ -11,6 +25,7 @@ const fixtureSearch = async (_, { matchDay }) => {
         ...fixture,
         awayTeam: teams.find((t) => t.id === fixture.awayTeamId),
         homeTeam: teams.find((t) => t.id === fixture.homeTeamId),
+        prediction: predictions.find((p) => p.fixtureId === fixture.id),
       };
     });
 };
@@ -36,10 +51,8 @@ const fixtureUpdateScore = async (_, { fixtureId, homeScore, awayScore }) => {
       fixtureId,
       (resource) => ({
         ...resource,
-        score: {
-          homeScore,
-          awayScore,
-        },
+        homeScore,
+        awayScore,
       })
     );
 
@@ -58,6 +71,7 @@ const fixtureUpdateScore = async (_, { fixtureId, homeScore, awayScore }) => {
 };
 
 module.exports = {
+  fixtureRead,
   fixtureSearch,
   fixtureUpdateScore,
   fixtureCreate,

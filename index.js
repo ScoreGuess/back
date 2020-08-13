@@ -3,9 +3,15 @@ const functions = require("firebase-functions");
 const express = require("express");
 const { ApolloServer } = require("apollo-server-express");
 const serviceAccount = require("./credentials.json");
-const { userCreate, userRead } = require("./User/resolvers");
+const {
+  userCreate,
+  userRead,
+  userCreatePrediction,
+  userSearchPredictions,
+} = require("./User/resolvers");
 const {
   fixtureSearch,
+  fixtureRead,
   fixtureUpdateScore,
   fixtureCreate,
 } = require("./Fixture/resolvers");
@@ -27,8 +33,10 @@ admin.initializeApp({
 const resolvers = {
   Query: {
     allTeams: teamSearch,
-    allFixtures: fixtureSearch,
+    fixtures: fixtureSearch,
+    fixture: fixtureRead,
     user: userRead,
+    predictions: userSearchPredictions,
   },
 
   Mutation: {
@@ -42,6 +50,7 @@ const resolvers = {
 
     // user related mutation resolvers
     userCreate,
+    userCreatePrediction,
   },
 };
 
