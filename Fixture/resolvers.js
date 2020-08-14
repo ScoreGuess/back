@@ -13,7 +13,8 @@ const fixtureRead = async (_, { fixtureId, userId }) => {
     homeTeam: teams.find((t) => t.id === fixture.homeTeamId),
   };
 };
-const fixtureSearch = async (_, { userId, matchDay }) => {
+
+const fixtureSearch = async (_, { matchDay }, { userId }) => {
   const fixtures = await find("fixtures");
   const teams = await find("teams");
   const predictions = await find(`users/${userId}/predictions`);

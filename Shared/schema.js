@@ -3,9 +3,9 @@ const { gql } = require("apollo-server-express");
 module.exports = gql`
   type User {
     id: ID!
-    firstName: String!
-    lastName: String!
-    email: String!
+    displayName: String
+    email: String
+    photoUrl: String
   }
   "Team represents a football team"
   type Team {
@@ -51,21 +51,19 @@ module.exports = gql`
   }
 
   type Query {
-    allTeams: [Team!]!
+    teams: [Team!]!
 
-    fixture(fixtureId: String!, userId: String!): Fixture!
-    """
-    allFixtures queries all the fixtures of the competition.
-    It accepts matchDay as an argument to filter fixtures on a specific matchDay
-    """
-    fixtures(matchDay: Int, userId: String!): [Fixture!]!
+    fixture(fixtureId: String!): Fixture!
+    fixtures(matchDay: Int): [Fixture!]!
 
     """
 
     """
-    user(userId: String!): User!
+    me: User!
 
-    predictions(userId: String!): [Prediction!]!
+    user(userId: String!): User
+
+    predictions(userId: String): [Prediction!]!
   }
 
   type Mutation {
@@ -94,7 +92,6 @@ module.exports = gql`
 
     "Adds a prediction"
     userCreatePrediction(
-      userId: String!
       fixtureId: String!
       homeScore: Int!
       awayScore: Int!

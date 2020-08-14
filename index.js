@@ -1,3 +1,5 @@
+const { AuthenticationError } = require("apollo-server-errors");
+
 const admin = require("firebase-admin");
 const functions = require("firebase-functions");
 const express = require("express");
@@ -16,7 +18,7 @@ const {
   fixtureCreate,
 } = require("./Fixture/resolvers");
 const { teamSearch, teamCreate, teamDelete } = require("./Team/resolvers");
-const typeDefs = require("./Shared/typeDefs");
+const typeDefs = require("./Shared/schema");
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
@@ -32,10 +34,14 @@ admin.initializeApp({
 // Create Update and Delete in Mutation
 const resolvers = {
   Query: {
-    allTeams: teamSearch,
+    teams: teamSearch,
     fixtures: fixtureSearch,
     fixture: fixtureRead,
-    user: userRead,
+    // to resolve me we get userId directly from the context
+    // see the context definition down below to find out more
+    me: (_, __, { userId }) => userRead(userId),
+    // when looking for a specific user we expect to have userId as an argument
+    user: (_, { userId }) => userRead(userId),
     predictions: userSearchPredictions,
   },
 
@@ -55,9 +61,28 @@ const resolvers = {
 };
 
 const app = express();
+
 const server = new ApolloServer({
   typeDefs: typeDefs,
   resolvers,
+  // user info is extract from the context
+  // see https://www.apollographql.com/docs/apollo-server/security/authentication/
+  context: async ({ req }) => {
+    const user = null;
+    const token =
+      req.headers.authorization != null
+        ? req.headers.authorization.substring(7)
+        : null;
+    if (!token) throw new AuthenticationError("you must be logged in");
+
+    try {
+      const { user_id } = await admin.auth().verifyIdToken(token);
+      // we prefer 🐪 over 🐍
+      return { userId: user_id };
+    } catch (e) {
+      throw new AuthenticationError("invalid token");
+    }
+  },
 });
 
 server.applyMiddleware({ app, path: "/", cors: true });
