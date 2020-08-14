@@ -1,5 +1,5 @@
 const admin = require("firebase-admin");
-const { findOne, find } = require("../Shared/db");
+const { findOne, find } = require("../utils/db");
 
 const userCreate = async (_, user) => {
   const ref = admin.database().ref("users");
@@ -19,7 +19,7 @@ const userRead = async (userId) => {
   };
 };
 
-const userCreatePrediction = async (_, { fixtureId, userId, ...rest }) => {
+const userCreatePrediction = async (_, { fixtureId, ...rest }, { userId }) => {
   // c.f. https://firebase.google.com/docs/database/admin/save-data#section-push
   const ref = admin.database().ref(`users/${userId}/predictions`);
   await ref.child(fixtureId).update({ fixtureId, ...rest });
@@ -46,4 +46,15 @@ module.exports = {
   userRead,
   userCreatePrediction,
   userSearchPredictions,
+  User: {
+    predictions: async (user, _, { userId }) => {
+      // if context's userId matches the parent user we are fetching info of the current user
+      // we can show the predictions in this case.
+      // a user should not have access to somebody else's predictions
+      if (userId === user.id) {
+        return await find(`users/${userId}/predictions`);
+      }
+      return null;
+    },
+  },
 };

@@ -6,6 +6,7 @@ module.exports = gql`
     displayName: String
     email: String
     photoUrl: String
+    predictions: [Prediction!]
   }
   "Team represents a football team"
   type Team {
@@ -80,7 +81,7 @@ module.exports = gql`
       startDate: String!
     ): Fixture
     "Updates the score of a fixture"
-    fixtureUpdateScore(fixtureId: ID!, homeScore: Int, awayScore: Int): Fixture
+    updateScore(fixtureId: ID!, homeScore: Int, awayScore: Int): Fixture
 
     "Adds a user"
     userCreate(

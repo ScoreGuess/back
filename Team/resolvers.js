@@ -1,4 +1,4 @@
-const { save, find, findOneAndDelete } = require("../Shared/db");
+const { save, find, findOneAndDelete } = require("../utils/db");
 
 const teamSearch = async (_, resource) => {
   return await find("teams");
