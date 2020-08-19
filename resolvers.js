@@ -1,3 +1,6 @@
+const { findOne } = require("./utils/db");
+const admin = require("firebase-admin");
+
 const {
   userCreate,
   userRead,
@@ -34,7 +37,12 @@ const resolvers = {
   },
   Fixture,
   User,
-
+  Prediction: {
+    attributes: (p) =>
+      p.attributes == null ? [] : p.attributes.map((type) => ({ type })),
+    fixture: async (prediction) =>
+      await findOne("fixtures", prediction.fixtureId),
+  },
   Mutation: {
     // teams related mutation resolvers
     teamCreate,
@@ -47,6 +55,15 @@ const resolvers = {
     // user related mutation resolvers
     userCreate,
     userCreatePrediction,
+    updateAttributes: async (_, { userId, fixtureId, attributeTypes }) => {
+      // c.f. https://firebase.google.com/docs/database/admin/save-data#section-push
+      const ref = admin
+        .database()
+        .ref(`users/${userId}/predictions/${fixtureId}/attributes`);
+      // Attribute model expect a Fixture and a User
+      attributeTypes.forEach((type) => ref.push(type));
+      return null;
+    },
   },
 };
 

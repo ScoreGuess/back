@@ -49,6 +49,27 @@ module.exports = gql`
     fixture: Fixture
     homeScore: Int!
     awayScore: Int!
+    "attributes should be calculated every week"
+    attributes: [Attribute!]
+  }
+
+  enum AttributeType {
+    "exact score duh!"
+    EXACT_SCORE
+    "good winner or draw"
+    EXACT_RESULT
+    "wrong result"
+    WRONG_RESULT
+  }
+
+  """
+  Attribute
+  """
+  type Attribute {
+    user: User!
+    "an attribute is always bond to a fixture even though it is something like 3 good score in a row"
+    fixture: Fixture!
+    type: AttributeType!
   }
 
   type Query {
@@ -58,12 +79,20 @@ module.exports = gql`
     fixtures(matchDay: Int): [Fixture!]!
 
     """
-
+    Returns the authenticated user and all its data
+    it uses the userId provided in the Authorization bearer token
     """
     me: User!
 
+    """
+    Returns the authenticated user
+    Note: predictions are not returned if the userId does not match the current authenticated userId
+    """
     user(userId: String!): User
 
+    """
+    returns a list of predictions
+    """
     predictions(userId: String): [Prediction!]!
   }
 
@@ -96,6 +125,16 @@ module.exports = gql`
       fixtureId: String!
       homeScore: Int!
       awayScore: Int!
+    ): Prediction
+
+    """
+    Updates the attributes of a Prediction. Usually this mutation is called after a fixture is over
+    Attributes are used to compute the amount of point a user has won for a fixture.
+    """
+    updateAttributes(
+      fixtureId: String!
+      userId: String!
+      attributeTypes: [AttributeType!]
     ): Prediction
   }
 `;

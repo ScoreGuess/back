@@ -24,7 +24,36 @@ yarn install
 
 Pour lancer le projet en version de développement
 ```
+yarn start
+```
 
+## Format de la base
+
+Les bases de données Real Time Database de Firebase permettent de stocker des collections d'objets assez simplement. 
+Dans notre cas on a défini les collections suivantes:
+- **teams** les équipes
+- **fixtures** les matches
+- **users** les utilisateurs
+
+La collection la plus importante est **users** car elle contient les **predictions**, **resultats** et autres infos
+nécessaires à l'app.
+Concretement dès lors qu'une ressource est créée ou associée à un utilisateur elle est stockée dans cette collection.
+Si on prend l'exemple d'une prédiction faite par l'utilisateur `{userId}` pour le match `{fixtureId}`
+ on aura chemin d'accès comme celui-ci:
+ 
+```
+/users/{userId}/predictions/{fixtureId}
+```
+### Predictions
+les prédictions sont situées au chemin d'accès suivant: `/users/{userId}/predictions`
+
+Elles sont stockées par id de match ce qui permet de les récupérer beaucoup plus facilement. 
+En d'autres termes il s'agit d'une map `<Fixture.id,Prediction>`
+
+### Results
+```
+// users/{userId}/predictions/{fixtureId}/points
+// users/{userId}/results/{weekId}/[Point]
 ```
 
 
