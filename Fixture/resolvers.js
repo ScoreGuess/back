@@ -5,9 +5,7 @@ const fixtureRead = async (_, { fixtureId, userId }) => {
 };
 
 const fixtureSearch = async (_, { matchDay }, { userId }) => {
-  const fixtures = await find("fixtures");
-
-  return fixtures;
+  return await find("fixtures");
 };
 
 const fixtureCreate = async (_, fixture) => {
@@ -17,6 +15,12 @@ const fixtureCreate = async (_, fixture) => {
   });
 };
 
+const updateStatus = async (_, { fixtureId, status }) => {
+  return await findOneAndUpdate("fixtures", fixtureId, (resource) => ({
+    ...resource,
+    status,
+  }));
+};
 /**
  * Updates the score of a fixture.
  * @param _ the resolver Parent param not used in this case
@@ -26,25 +30,11 @@ const fixtureCreate = async (_, fixture) => {
  */
 const updateScore = async (_, { fixtureId, homeScore, awayScore }) => {
   try {
-    const updatedResource = await findOneAndUpdate(
-      "fixtures",
-      fixtureId,
-      (resource) => ({
-        ...resource,
-        homeScore,
-        awayScore,
-      })
-    );
-
-    //TODO find a better approach than copy pasting the following code...
-    const teams = await find("teams");
-
-    // the fixture we return via graphql expects teams to be populated
-    return {
-      ...updatedResource,
-      awayTeam: teams.find((t) => t.id === updatedResource.awayTeamId),
-      homeTeam: teams.find((t) => t.id === updatedResource.homeTeamId),
-    };
+    return await findOneAndUpdate("fixtures", fixtureId, (resource) => ({
+      ...resource,
+      homeScore,
+      awayScore,
+    }));
   } catch (e) {
     console.error(e);
   }
@@ -53,6 +43,7 @@ const updateScore = async (_, { fixtureId, homeScore, awayScore }) => {
 module.exports = {
   fixtureRead,
   fixtureSearch,
+  updateStatus,
   updateScore,
   fixtureCreate,
   Fixture: {

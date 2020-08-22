@@ -12,6 +12,7 @@ const {
   fixtureSearch,
   fixtureRead,
   updateScore,
+  updateStatus,
   fixtureCreate,
   Fixture,
 } = require("./Fixture/resolvers");
@@ -51,7 +52,7 @@ const resolvers = {
     // fixtures related mutation resolvers
     fixtureCreate,
     updateScore,
-
+    updateStatus,
     // user related mutation resolvers
     userCreate,
     userCreatePrediction,

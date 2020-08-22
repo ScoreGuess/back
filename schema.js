@@ -112,6 +112,9 @@ module.exports = gql`
     "Updates the score of a fixture"
     updateScore(fixtureId: ID!, homeScore: Int, awayScore: Int): Fixture
 
+    "Updates the status of a fixture"
+    updateStatus(fixtureId: ID!, status: FixtureStatus!): Fixture
+
     "Adds a user"
     userCreate(
       userId: String!
