@@ -32,11 +32,6 @@ const onDelete = async (fixture) => {
     await tasksClient.deleteTask({
       name: _finishedTaskName,
     });
-    /*   await findOneAndUpdate("fixtures", fixture.id, (resource) => ({
-      ...resource,
-      _inProgressTaskName: null,
-      _finishedTaskName: null,
-    }));*/
   } catch (e) {
     console.log(e);
   }
@@ -45,7 +40,7 @@ const onDelete = async (fixture) => {
 const onCreate = async (fixture) => {
   let date = new Date(fixture.startDate).getTime() / 1000;
   // hack to adapt to correct timestamp
-  // la flemme de mettre moment
+  // la flemme de mettre momentjs
   date -= 60 * 60 * 2;
 
   const inProgressTask = {
@@ -107,6 +102,7 @@ const onCreate = async (fixture) => {
   }
 };
 
+// create cloud tasks to call updateStatus for fixture when it starts or it ends
 module.exports = functions.database
   .ref("/fixtures/{fixtureId}")
   .onWrite(async (change, context) => {

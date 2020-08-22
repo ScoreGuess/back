@@ -30,7 +30,10 @@ const server = new ApolloServer({
   // see https://www.apollographql.com/docs/apollo-server/security/authentication/
   context: async ({ req }) => {
     if (checkAPIKey(req) === true) {
-      return {};
+      // when using api key, automatically use my userId
+      return {
+        userId: "24S8zgYYT6UWD8IgTMA3HXYkqDo1",
+      };
     } else {
       const token = checkToken(req);
       if (!token) throw new AuthenticationError("you must be logged in");
