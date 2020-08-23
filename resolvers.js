@@ -39,8 +39,11 @@ const resolvers = {
   Fixture,
   User,
   Prediction: {
-    attributes: (p) =>
-      p.attributes == null ? [] : p.attributes.map((type) => ({ type })),
+    attributes: (p) => {
+      return p.attributes == null
+        ? []
+        : Object.values(p.attributes).map((type) => ({ type }));
+    },
     fixture: async (prediction) =>
       await findOne("fixtures", prediction.fixtureId),
   },
