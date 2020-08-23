@@ -58,52 +58,73 @@ exports.graphql = functions.https.onRequest(app);
 // everyTime a fixture is created, this function will register tasks to update the status when the match starts or ends
 exports.onFixtureWrite = onFixtureWrite;
 
+const computeResultAttribute = (userId, prediction, fixture) => {
+  const ref = admin
+    .database()
+    .ref(`users/${userId}/predictions/${fixture.id}/attributes`);
+
+  if (
+    prediction.homeScore === fixture.homeScore &&
+    prediction.awayScore === fixture.awayScore
+  ) {
+    return "EXACT_SCORE";
+  }
+
+  const predictionResult = prediction.homeScore - prediction.awayScore;
+  const fixtureResult = fixture.homeScore - fixture.awayScore;
+  if (predictionResult === 0 && fixtureResult === 0) {
+    return "EXACT_RESULT";
+  }
+  //prevent draw prediction to be consider as exact result
+  // check if they have the same sign
+  if (
+    predictionResult !== 0 &&
+    fixtureResult !== 0 &&
+    predictionResult > 0 === fixtureResult > 0
+  ) {
+    return "EXACT_RESULT";
+  }
+  return "WRONG_RESULT";
+};
+
+const filterStartedDuringLastWeek = (fixture) => {
+  const lastWeek = moment().subtract(1, "week");
+  const now = moment();
+  return moment(fixture.startDate, "DD-MM-YYYYTHH:mm").isBetween(lastWeek, now);
+};
+const filterFinished = (fixture) => fixture.status === "FINISHED";
+
 exports.onDayEnd = functions.https.onRequest(async (req, res) => {
-  const fixtures = await find("fixtures");
   const snapshot = await admin.database().ref("users").once("value");
-
   const userEntries = Object.entries(snapshot.val());
-  const oneWeekBefore = moment().subtract(1, "week");
 
+  const fixtures = await find("fixtures");
   const finishedFixtures = fixtures
-    .filter((fixture) =>
-      moment(fixture.startDate, "DD-MM-YYYYTHH:mm").isBetween(
-        oneWeekBefore,
-        moment()
-      )
-    )
-    .filter((fixture) => fixture.status === "FINISHED");
+    .filter(filterStartedDuringLastWeek)
+    .filter(filterFinished);
 
   userEntries.map(([userId, { predictions }]) => {
     finishedFixtures.map((fixture) => {
       const prediction = predictions[fixture.id];
-
       if (prediction == null) return;
+      // ☝️ if the user has not predicted the score then no need to continue
 
-      if (
-        prediction.homeScore === fixture.homeScore &&
-        prediction.awayScore === fixture.awayScore
-      ) {
-        console.log("exact score");
-        return;
-      }
+      // select the attribute of the prediction
+      const ref = admin
+        .database()
+        .ref(`users/${userId}/predictions/${fixture.id}/attributes`);
 
-      const predictionResult = prediction.homeScore - prediction.awayScore;
-      const fixtureResult = fixture.homeScore - fixture.awayScore;
-      if (predictionResult === 0 && fixtureResult === 0) {
-        console.log("exact result draw");
-        return;
-      }
-      //prevent draw prediction to be consider as exact result
-      // check if they have the same sign
-      if (
-        predictionResult !== 0 &&
-        fixtureResult !== 0 &&
-        predictionResult > 0 === fixtureResult > 0
-      )
-        console.log("exact result winner");
+      // remove previous attributes
+      ref.remove();
+      // right now we handle only one sort of attribute
+      // but later we will deal with more:)
+      const resultAttribute = computeResultAttribute(
+        userId,
+        fixture,
+        prediction
+      );
+      ref.push(resultAttribute);
     });
   });
-
   res.send("ok");
 });
