@@ -79,6 +79,10 @@ module.exports = gql`
     fixtures(matchDay: Int): [Fixture!]!
 
     """
+    Resolves the last matchDay entered
+    """
+    currentMatchDay: Int!
+    """
     Returns the authenticated user and all its data
     it uses the userId provided in the Authorization bearer token
     """

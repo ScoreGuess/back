@@ -3,7 +3,19 @@ const { save, find, findOne, findOneAndUpdate } = require("../utils/db");
 const fixtureRead = async (_, { fixtureId, userId }) => {
   return await findOne("fixtures", fixtureId);
 };
+const currentMatchDay = async () => {
+  const fixtures = await find("fixtures");
+  const grouped = fixtures.reduce((groupedFixtures, fixture) => {
+    const day = fixture.matchDay;
+    const group = groupedFixtures[day] != null ? groupedFixtures[day] : [];
+    return { ...groupedFixtures, [day]: [...group, fixture] };
+  }, {});
 
+  const [[currentMatchDay]] = Object.entries(grouped).sort(
+    ([keyA], [keyB]) => keyB - keyA
+  );
+  return currentMatchDay;
+};
 const fixtureSearch = async (_, { matchDay }) => {
   const fixtures = await find("fixtures");
   if (matchDay == null) {
@@ -55,6 +67,7 @@ const updateScore = async (_, { fixtureId, homeScore, awayScore }) => {
 };
 
 module.exports = {
+  currentMatchDay,
   fixtureRead,
   fixtureSearch,
   updateStatus,

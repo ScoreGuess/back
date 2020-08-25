@@ -13,6 +13,7 @@ const {
   fixtureRead,
   updateScore,
   updateStatus,
+  currentMatchDay,
   fixtureCreate,
   Fixture,
 } = require("./Fixture/resolvers");
@@ -29,6 +30,8 @@ const resolvers = {
     teams: teamSearch,
     fixtures: fixtureSearch,
     fixture: fixtureRead,
+    currentMatchDay,
+
     // to resolve me we get userId directly from the context
     // see the context definition down below to find out more
     me: (_, __, { userId }) => userRead(userId),
