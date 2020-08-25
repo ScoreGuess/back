@@ -4,8 +4,22 @@ const fixtureRead = async (_, { fixtureId, userId }) => {
   return await findOne("fixtures", fixtureId);
 };
 
-const fixtureSearch = async (_, { matchDay }, { userId }) => {
-  return await find("fixtures");
+const fixtureSearch = async (_, { matchDay }) => {
+  const fixtures = await find("fixtures");
+  if (matchDay == null) {
+    const grouped = fixtures.reduce((groupedFixtures, fixture) => {
+      const day = fixture.matchDay;
+      const group = groupedFixtures[day] != null ? groupedFixtures[day] : [];
+      return { ...groupedFixtures, [day]: [...group, fixture] };
+    }, {});
+
+    const [[_, currentMatchDayFixtures]] = Object.entries(grouped).sort(
+      ([keyA], [keyB]) => keyB - keyA
+    );
+    return currentMatchDayFixtures;
+  } else {
+    return fixtures.filter((fixture) => fixture.matchDay === matchDay);
+  }
 };
 
 const fixtureCreate = async (_, fixture) => {
