@@ -40,7 +40,12 @@ const fixtureCreate = async (_, fixture) => {
     status: "PLANNED",
   });
 };
-
+const updateStartDate = async (_, { fixtureId, startDate }) => {
+  return await findOneAndUpdate("fixtures", fixtureId, (resource) => ({
+    ...resource,
+    startDate,
+  }));
+};
 const updateStatus = async (_, { fixtureId, status }) => {
   return await findOneAndUpdate("fixtures", fixtureId, (resource) => ({
     ...resource,
@@ -72,6 +77,7 @@ module.exports = {
   fixtureSearch,
   updateStatus,
   updateScore,
+  updateStartDate,
   fixtureCreate,
   Fixture: {
     prediction: async (fixture, _, { userId }) =>

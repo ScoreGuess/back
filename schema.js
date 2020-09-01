@@ -41,6 +41,18 @@ module.exports = gql`
     prediction: Prediction
   }
 
+  type Standing {
+    user: User!
+    rank: Int
+  }
+
+  type Group {
+    id: ID!
+    participants: [User!]!
+    name: String!
+    standings: [Standing]
+  }
+
   """
   Prediction represents a prediction
   """
@@ -73,6 +85,7 @@ module.exports = gql`
   }
 
   type Query {
+    groups: [Group!]!
     teams: [Team!]!
 
     fixture(fixtureId: String!): Fixture!
@@ -101,6 +114,9 @@ module.exports = gql`
   }
 
   type Mutation {
+    createGroup(groupName: String!): Group
+    joinGroup(groupId: ID!, userId: String!): Group
+
     "Adds a team to the competition"
     teamCreate(shortName: String!, longName: String!, logo: String!): Team
     "Removes a team from a competition"
@@ -118,6 +134,8 @@ module.exports = gql`
 
     "Updates the status of a fixture"
     updateStatus(fixtureId: ID!, status: FixtureStatus!): Fixture
+    "Update the date"
+    updateStartDate(fixtureId: ID!, startDate: String!): Fixture
 
     "Adds a user"
     userCreate(

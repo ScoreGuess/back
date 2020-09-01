@@ -54,7 +54,9 @@ module.exports = {
       if (userId === user.id) {
         return await find(`users/${userId}/predictions`);
       }
-      return null;
+      const predictions = await find(`users/${user.id}/predictions`);
+      //p.attributes!=null should occur only if the fixture is finished
+      return predictions.filter((p) => p.attributes != null);
     },
   },
 };

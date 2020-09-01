@@ -59,10 +59,6 @@ exports.graphql = functions.https.onRequest(app);
 exports.onFixtureWrite = onFixtureWrite;
 
 const computeResultAttribute = (userId, prediction, fixture) => {
-  const ref = admin
-    .database()
-    .ref(`users/${userId}/predictions/${fixture.id}/attributes`);
-
   if (
     prediction.homeScore === fixture.homeScore &&
     prediction.awayScore === fixture.awayScore
@@ -97,10 +93,9 @@ const filterFinished = (fixture) => fixture.status === "FINISHED";
 exports.onDayEnd = functions.https.onRequest(async (req, res) => {
   const snapshot = await admin.database().ref("users").once("value");
   const userEntries = Object.entries(snapshot.val());
-
   const fixtures = await find("fixtures");
   const finishedFixtures = fixtures
-    .filter(filterStartedDuringLastWeek)
+    //.filter(filterStartedDuringLastWeek)
     .filter(filterFinished);
 
   userEntries.map(([userId, { predictions }]) => {

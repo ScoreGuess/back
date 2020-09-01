@@ -1,18 +1,13 @@
-const { findOne } = require("./utils/db");
 const admin = require("firebase-admin");
-
-const {
-  userCreate,
-  userRead,
-  userCreatePrediction,
-  userSearchPredictions,
-  User,
-} = require("./User/resolvers");
+const fromGroups = require("./Groups/resolvers");
+const fromPredictions = require("./Predictions/resolvers");
+const fromUser = require("./User/resolvers");
 const {
   fixtureSearch,
   fixtureRead,
   updateScore,
   updateStatus,
+  updateStartDate,
   currentMatchDay,
   fixtureCreate,
   Fixture,
@@ -27,6 +22,7 @@ const { teamSearch, teamCreate, teamDelete } = require("./Team/resolvers");
 // Create Update and Delete in Mutation
 const resolvers = {
   Query: {
+    groups: fromGroups.search,
     teams: teamSearch,
     fixtures: fixtureSearch,
     fixture: fixtureRead,
@@ -34,23 +30,18 @@ const resolvers = {
 
     // to resolve me we get userId directly from the context
     // see the context definition down below to find out more
-    me: (_, __, { userId }) => userRead(userId),
+    me: (_, __, { userId }) => fromUser.userRead(userId),
     // when looking for a specific user we expect to have userId as an argument
-    user: (_, { userId }) => userRead(userId),
-    predictions: userSearchPredictions,
+    user: (_, { userId }) => fromUser.userRead(userId),
+    predictions: fromUser.userSearchPredictions,
   },
   Fixture,
-  User,
-  Prediction: {
-    attributes: (p) => {
-      return p.attributes == null
-        ? []
-        : Object.values(p.attributes).map((type) => ({ type }));
-    },
-    fixture: async (prediction) =>
-      await findOne("fixtures", prediction.fixtureId),
-  },
+  User: fromUser.User,
+  Prediction: fromPredictions.Prediction,
+  Group: fromGroups.Group,
   Mutation: {
+    createGroup: fromGroups.create,
+    joinGroup: fromGroups.join,
     // teams related mutation resolvers
     teamCreate,
     teamDelete,
@@ -59,9 +50,10 @@ const resolvers = {
     fixtureCreate,
     updateScore,
     updateStatus,
+    updateStartDate,
     // user related mutation resolvers
-    userCreate,
-    userCreatePrediction,
+    userCreate: fromUser.userCreate,
+    userCreatePrediction: fromUser.userCreatePrediction,
     updateAttributes: async (_, { userId, fixtureId, attributeTypes }) => {
       // c.f. https://firebase.google.com/docs/database/admin/save-data#section-push
       const ref = admin
