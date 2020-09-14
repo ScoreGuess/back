@@ -17,6 +17,8 @@ Très plébiscité en ce moment, ce la permet de manipuler les données sous for
 ## Pour démarrer
 Pensez à installer [node](https://nodejs.org/en/download/) et [yarn](https://yarnpkg.com/) au préalable 🤗
 
+ScoreGuess repose sur firebase et a donc besoin du cli de firebase pour fonctionner. Il faut installer le cli qui se trouve [ici](https://firebase.google.com/docs/cli)
+
 Une fois le projet cloné depuis GitHub, il faut se mettre à la racine du projet et lancer les commandes suivantes.
 ```
 yarn install
