@@ -19,8 +19,16 @@ const userRead = async (userId) => {
   };
 };
 
-const userCreatePrediction = async (_, { fixtureId, ...rest }, { userId }) => {
+// (parent, arguments, context)=> {
+//
+// }
+const userCreatePrediction = async (
+  _,
+  { fixtureId, userId, ...rest },
+  context
+) => {
   // c.f. https://firebase.google.com/docs/database/admin/save-data#section-push
+  userId = userId == null ? context.userId : userId;
   const ref = admin.database().ref(`users/${userId}/predictions`);
   await ref.child(fixtureId).update({ fixtureId, ...rest });
   const fixture = await findOne("fixtures", fixtureId);

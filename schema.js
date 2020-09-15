@@ -129,6 +129,7 @@ module.exports = gql`
       matchDay: Int
       startDate: String!
     ): Fixture
+
     "Updates the score of a fixture"
     updateScore(fixtureId: ID!, homeScore: Int, awayScore: Int): Fixture
 
@@ -150,6 +151,7 @@ module.exports = gql`
       fixtureId: String!
       homeScore: Int!
       awayScore: Int!
+      userId: ID
     ): Prediction
 
     """

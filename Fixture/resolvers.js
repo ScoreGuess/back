@@ -3,6 +3,7 @@ const { save, find, findOne, findOneAndUpdate } = require("../utils/db");
 const fixtureRead = async (_, { fixtureId, userId }) => {
   return await findOne("fixtures", fixtureId);
 };
+
 const currentMatchDay = async () => {
   const fixtures = await find("fixtures");
   const grouped = fixtures.reduce((groupedFixtures, fixture) => {
