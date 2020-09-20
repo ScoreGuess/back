@@ -22,6 +22,7 @@ const { teamSearch, teamCreate, teamDelete } = require("./Team/resolvers");
 // Create Update and Delete in Mutation
 const resolvers = {
   Query: {
+    group: fromGroups.read,
     groups: fromGroups.search,
     teams: teamSearch,
     fixtures: fixtureSearch,

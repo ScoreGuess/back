@@ -86,6 +86,8 @@ module.exports = gql`
   }
 
   type Query {
+    group(groupId:String!): Group
+      
     groups: [Group!]!
     teams: [Team!]!
 
@@ -116,7 +118,8 @@ module.exports = gql`
 
   type Mutation {
     createGroup(name: String!): Group
-    joinGroup(groupId: ID!, userId: String!): Group
+    
+    joinGroup(groupId: String!, userId: String): Group
 
     "Adds a team to the competition"
     teamCreate(shortName: String!, longName: String!, logo: String!): Team

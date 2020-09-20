@@ -1,4 +1,4 @@
-const { save, find, findOneAndUpdate } = require("../utils/db");
+const { save, find,findOne, findOneAndUpdate } = require("../utils/db");
 const admin = require("firebase-admin");
 
 const create = async (_, resource, { userId }) => {
@@ -8,7 +8,8 @@ const create = async (_, resource, { userId }) => {
     author: userId,
   });
 };
-const join = async (_, { groupId, userId }) => {
+const join = async (_, { groupId, userId },context) => {
+  userId = userId ==null ?  context.userId:userId
   return await findOneAndUpdate("groups", groupId, (group) => ({
     ...group,
     participants: [...group.participants, userId].filter(
@@ -21,11 +22,20 @@ const search = async (_, __, { userId }) => {
   return await find("groups");
 };
 
+const read = async (_, { groupId}, { userId }) => {
+  return await findOne("groups", groupId);
+};
+
 module.exports = {
   create,
+  read,
   search,
   join,
   Group: {
+    author: async (group)=>{
+      const user = await admin.auth().getUser(group.author)
+      return {...user, id: user.uid}
+    },
     participants: async (group) => {
       // c.f. https://firebase.google.com/docs/auth/admin/manage-users?authuser=0#retrieve_user_data
       const { users } = await admin

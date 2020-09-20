@@ -20,7 +20,7 @@ interface JoinGroupProps {
 }
 const JoinCard:FunctionComponent<JoinGroupProps> = ({group})=>{
     return <div>
-        <a href={`scoreguess://join/${group.id}`}>{group.author.displayName} vous invite à Rejoindre {group.name}</a>
+        <a href={`scoreguess://join/${group.id}`}>Vous avez été invité à rejoindre {group.name}</a>
     </div>
 }
 
@@ -43,9 +43,7 @@ function App() {
     console.log(window.btoa(JSON.stringify({
         id:"test",
         name:"Ligue Hein?",
-        author: {
-            displayName:"Chazz"
-        }
+
     })))
     return (
         <div className="App">
