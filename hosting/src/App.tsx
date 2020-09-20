@@ -1,26 +1,61 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, {FunctionComponent} from 'react';
+import {RouteComponentProps, Router} from '@reach/router'
+
+
+type User = {
+    displayName:string;
+}
+type Group = {
+    id:string;
+    name:string;
+    author: User;
+}
+
+interface JoinRouteProps {
+    token: string;
+}
+
+interface JoinGroupProps {
+    group: Group
+}
+const JoinCard:FunctionComponent<JoinGroupProps> = ({group})=>{
+    return <div>
+        <a href={`scoreguess://join/${group.id}`}>{group.author.displayName} vous invite à Rejoindre {group.name}</a>
+    </div>
+}
+
+const JoinRoute: FunctionComponent<RouteComponentProps<JoinRouteProps>> = ({token}) => {
+    let group
+    try {
+        if (token != null) {
+            const decoded = window.atob(token)
+            group = JSON.parse(decoded)
+        }
+    } catch (e) {
+        console.log(e)
+        //setState(e)
+    } finally {
+        return <JoinCard group={group}/>
+    }
+}
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    console.log(window.btoa(JSON.stringify({
+        id:"test",
+        name:"Ligue Hein?",
+        author: {
+            displayName:"Chazz"
+        }
+    })))
+    return (
+        <div className="App">
+            <Router>
+                <JoinRoute path="join/:token"/>
+            </Router>
+        </div>
+    );
 }
 
 export default App;
+
+
