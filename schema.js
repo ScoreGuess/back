@@ -48,6 +48,7 @@ module.exports = gql`
 
   type Group {
     id: ID!
+    author: User!
     participants: [User!]!
     name: String!
     standings: [Standing]
@@ -114,7 +115,7 @@ module.exports = gql`
   }
 
   type Mutation {
-    createGroup(groupName: String!): Group
+    createGroup(name: String!): Group
     joinGroup(groupId: ID!, userId: String!): Group
 
     "Adds a team to the competition"

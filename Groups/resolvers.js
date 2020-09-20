@@ -5,6 +5,7 @@ const create = async (_, resource, { userId }) => {
   return await save("groups", {
     ...resource,
     participants: [userId],
+    author: userId,
   });
 };
 const join = async (_, { groupId, userId }) => {
