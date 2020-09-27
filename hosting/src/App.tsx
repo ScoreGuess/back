@@ -20,7 +20,7 @@ interface JoinGroupProps {
 }
 const JoinCard:FunctionComponent<JoinGroupProps> = ({group})=>{
     return <div>
-        <a href={`scoreguess://join/${group.id}`}>Vous avez été invité à rejoindre {group.name}</a>
+        <a href={`scoreguess://join/${group.id}`}>Vous avez été invité à rejoindre {decodeURIComponent(group.name)}</a>
     </div>
 }
 
@@ -28,23 +28,18 @@ const JoinRoute: FunctionComponent<RouteComponentProps<JoinRouteProps>> = ({toke
     let group
     try {
         if (token != null) {
-            const decoded = window.atob(token)
+            const decoded =window.atob(token);
             group = JSON.parse(decoded)
         }
     } catch (e) {
         console.log(e)
         //setState(e)
     } finally {
-        return <JoinCard group={group}/>
     }
+        return <JoinCard group={group}/>
 }
 
 function App() {
-    console.log(window.btoa(JSON.stringify({
-        id:"test",
-        name:"Ligue Hein?",
-
-    })))
     return (
         <div className="App">
             <Router>
