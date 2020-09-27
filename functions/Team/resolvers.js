@@ -1,15 +1,15 @@
 const { save, find, findOneAndDelete } = require("../utils/db");
 
-const teamSearch = async (_, resource) => {
+const search = async (_, resource) => {
   return await find("teams");
 };
-const teamCreate = async (_, resource) => {
+const create = async (_, resource) => {
   return await save("teams", {
     ...resource,
   });
 };
 
-const teamDelete = async (_, { teamId }) => {
+const remove = async (_, { teamId }) => {
   try {
     const deletedTeam = await findOneAndDelete("teams", teamId);
     return {
@@ -21,7 +21,15 @@ const teamDelete = async (_, { teamId }) => {
 };
 
 module.exports = {
-  teamSearch,
-  teamCreate,
-  teamDelete,
+  search,
+  create,
+  remove,
+  Team:{
+    fixtures: async (team)=>{
+      const fixtures =await find("fixtures")
+      return fixtures.filter(f=>{
+        return team.id === f.awayTeamId || team.id === f.homeTeamId
+      })
+    }
+  }
 };

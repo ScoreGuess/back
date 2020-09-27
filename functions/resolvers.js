@@ -12,7 +12,7 @@ const {
   fixtureCreate,
   Fixture,
 } = require("./Fixture/resolvers");
-const { teamSearch, teamCreate, teamDelete } = require("./Team/resolvers");
+const fromTeam = require("./Team/resolvers");
 // naming convention for resolvers is ResourceType+Action+DataType?
 // resourceType: Team, Fixture etc...
 // action: SCRUD => search, create, read, update, delete
@@ -24,7 +24,7 @@ const resolvers = {
   Query: {
     group: fromGroups.read,
     groups: fromGroups.search,
-    teams: teamSearch,
+    teams: fromTeam.search,
     fixtures: fixtureSearch,
     fixture: fixtureRead,
     currentMatchDay,
@@ -37,6 +37,7 @@ const resolvers = {
     predictions: fromUser.userSearchPredictions,
   },
   Fixture,
+  Team:fromTeam.Team,
   User: fromUser.User,
   Prediction: fromPredictions.Prediction,
   Group: fromGroups.Group,
@@ -44,8 +45,8 @@ const resolvers = {
     createGroup: fromGroups.create,
     joinGroup: fromGroups.join,
     // teams related mutation resolvers
-    teamCreate,
-    teamDelete,
+    teamCreate: fromTeam.create,
+    teamDelete: fromTeam.remove,
 
     // fixtures related mutation resolvers
     fixtureCreate,

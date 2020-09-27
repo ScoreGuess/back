@@ -14,6 +14,7 @@ module.exports = gql`
     shortName: String!
     longName: String!
     logo: String!
+      fixtures:[Fixture!]
   }
 
   """
@@ -90,7 +91,8 @@ module.exports = gql`
       
     groups: [Group!]!
     teams: [Team!]!
-
+    team: Team!
+      
     fixture(fixtureId: String!): Fixture!
     fixtures(matchDay: Int): [Fixture!]!
 
