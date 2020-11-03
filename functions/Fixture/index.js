@@ -41,7 +41,8 @@ const onCreate = async (fixture) => {
   let date = new Date(fixture.startDate).getTime() / 1000;
   // hack to adapt to correct timestamp
   // la flemme de mettre momentjs
-  date -= 60 * 60 * 2;
+  // attention ckc le dimanche 29 mars
+  date -= 60 * 60;
 
   const inProgressTask = {
     httpRequest: {
