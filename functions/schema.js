@@ -40,6 +40,7 @@ module.exports = gql`
     homeScore: Int
     awayScore: Int
     prediction: Prediction
+    predictions: [Prediction!]!
   }
 
   type Standing {
@@ -94,7 +95,7 @@ module.exports = gql`
     team: Team!
       
     fixture(fixtureId: String!): Fixture!
-    fixtures(matchDay: Int): [Fixture!]!
+    fixtures(matchDay: Int, groupId:String): [Fixture!]!
 
     """
     Resolves the last matchDay entered
