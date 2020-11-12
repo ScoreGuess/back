@@ -17,8 +17,11 @@ const currentMatchDay = async () => {
     );
     return currentMatchDay;
 };
-const fixtureSearch = async (_, {matchDay, groupId}) => {
+const fixtureSearch = async (_, {matchDay, status, groupId}) => {
     const fixtures = await find("fixtures");
+    if(status !=null){
+        return fixtures.filter(fixture=> fixture.status === status)
+    }
     if (matchDay == null) {
         const grouped = fixtures.reduce((groupedFixtures, fixture) => {
             const day = fixture.matchDay;

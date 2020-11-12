@@ -95,8 +95,7 @@ module.exports = gql`
     team: Team!
       
     fixture(fixtureId: String!): Fixture!
-    fixtures(matchDay: Int, groupId:String): [Fixture!]!
-
+    fixtures(status: FixtureStatus, matchDay: Int, groupId:String): [Fixture!]!
     """
     Resolves the last matchDay entered
     """
