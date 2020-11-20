@@ -1,5 +1,6 @@
 const admin = require("firebase-admin");
 const fromGroups = require("./Groups/resolvers");
+const fromCompetition = require("./Competition/resolvers");
 const fromPredictions = require("./Predictions/resolvers");
 const fromUser = require("./User/resolvers");
 const {
@@ -22,6 +23,7 @@ const fromTeam = require("./Team/resolvers");
 // Create Update and Delete in Mutation
 const resolvers = {
   Query: {
+    competitions: fromCompetition.search,
     group: fromGroups.read,
     groups: fromGroups.search,
     teams: fromTeam.search,
@@ -42,6 +44,8 @@ const resolvers = {
   Prediction: fromPredictions.Prediction,
   Group: fromGroups.Group,
   Mutation: {
+    createCompetition: fromCompetition.create,
+    // group
     createGroup: fromGroups.create,
     joinGroup: fromGroups.join,
     // teams related mutation resolvers

@@ -1,8 +1,9 @@
 const {save, find, findOne, findOneAndUpdate} = require("../utils/db");
-
+const moment =require('moment');
 const fixtureRead = async (_, {fixtureId, userId}) => {
     return await findOne("fixtures", fixtureId);
 };
+
 
 const currentMatchDay = async () => {
     const fixtures = await find("fixtures");
@@ -17,34 +18,32 @@ const currentMatchDay = async () => {
     );
     return currentMatchDay;
 };
-const fixtureSearch = async (_, {matchDay, status, groupId}) => {
+const fixtureSearch = async (_, {matchDay, start, end, status, groupId}) => {
     const fixtures = await find("fixtures");
-    if(status !=null){
-        return fixtures.filter(fixture=> fixture.status === status)
-    }
-    if (matchDay == null) {
-        const grouped = fixtures.reduce((groupedFixtures, fixture) => {
-            const day = fixture.matchDay;
-            const group = groupedFixtures[day] != null ? groupedFixtures[day] : [];
-            return {...groupedFixtures, [day]: [...group, {...fixture, groupId}]};
-        }, {});
 
-        const [[_, currentMatchDayFixtures]] = Object.entries(grouped).sort(
-            ([keyA], [keyB]) => keyB - keyA
-        );
-        return currentMatchDayFixtures;
-    } else {
-        return fixtures
-            .map(fixture => ({...fixture, groupId}))
-            .filter((fixture) => fixture.matchDay === matchDay);
-    }
+    return fixtures
+        .map(fixture => ({...fixture, groupId}))
+        .filter((fixture) => matchDay == null || fixture.matchDay === matchDay)
+        .filter(fixture => status == null || fixture.status === status)
+        .filter((fixture) => start == null || moment(fixture.startDate, 'YYYY-MM-DDTHH:mm').isAfter(start, "YYYY-MM-DD"))
+        .filter((fixture) => end == null || moment(fixture.startDate, 'YYYY-MM-DDTHH:mm').isBefore(end, "YYYY-MM-DD"))
+
 };
 
 const fixtureCreate = async (_, fixture) => {
-    return await save("fixtures", {
+    const {competition: competitionId} = fixture
+    const saved = await save("fixtures", {
         ...fixture,
         status: "PLANNED",
     });
+    await findOneAndUpdate('competitions', competitionId, competition => ({
+        ...competition,
+        allFixturesIds: [
+            ...(competition != null && competition.allFixturesIds != null ? competition.allFixturesIds : []),
+            saved.id
+        ]
+    }))
+    return saved
 };
 const updateStartDate = async (_, {fixtureId, startDate}) => {
     return await findOneAndUpdate("fixtures", fixtureId, (resource) => ({
@@ -91,22 +90,22 @@ module.exports = {
         homeTeam: async (fixture) => await findOne("teams", fixture.homeTeamId),
         awayTeam: async (fixture) => await findOne("teams", fixture.awayTeamId),
         predictions: async (fixture) => {
-            if(fixture.groupId == null) return []
+            if (fixture.groupId == null) return []
             const group = await findOne("groups", fixture.groupId);
             const participants = await Promise.all(group.participants.map(async userId => {
                 const predictions = await find(`users/${userId}/predictions`)
-                return  { id:userId, predictions}
+                return {id: userId, predictions}
             }))
             return participants.map(participant => {
-                const prediction = participant.predictions.find(p=>p.fixtureId===fixture.id)
-                if(prediction==null)return null
+                const prediction = participant.predictions.find(p => p.fixtureId === fixture.id)
+                if (prediction == null) return null
                 return {
                     ...prediction,
-                    user:{
-                        id:participant.id
+                    user: {
+                        id: participant.id
                     }
                 }
-            }).filter(p=>p!=null)
+            }).filter(p => p != null)
         }
     },
 };

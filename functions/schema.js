@@ -26,7 +26,10 @@ module.exports = gql`
     IN_PROGRESS
     FINISHED
   }
-
+  type Competition {
+      id:ID!
+      name: String!
+  }
   """
   Fixture represents a match between two teams
   """
@@ -54,6 +57,7 @@ module.exports = gql`
     participants: [User!]!
     name: String!
     standings: [Standing]
+    createdAt:String!
   }
 
   """
@@ -88,6 +92,7 @@ module.exports = gql`
   }
 
   type Query {
+    competitions:[Competition!]!
     group(groupId:String!): Group
       
     groups: [Group!]!
@@ -95,7 +100,7 @@ module.exports = gql`
     team: Team!
       
     fixture(fixtureId: String!): Fixture!
-    fixtures(status: FixtureStatus, matchDay: Int, groupId:String): [Fixture!]!
+    fixtures(status: FixtureStatus, groupId:String, start:String, end:String, matchDay:Int): [Fixture!]!
     """
     Resolves the last matchDay entered
     """
@@ -133,7 +138,8 @@ module.exports = gql`
       awayTeamId: ID!
       homeTeamId: ID!
       matchDay: Int
-      startDate: String!
+      competition: ID!
+      startDate: String
     ): Fixture
 
     "Updates the score of a fixture"
@@ -169,5 +175,9 @@ module.exports = gql`
       userId: String!
       attributeTypes: [AttributeType!]
     ): Prediction
+      
+      createCompetition(
+          name:String!
+      ):Competition
   }
 `;
