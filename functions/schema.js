@@ -44,11 +44,17 @@ module.exports = gql`
     awayScore: Int
     prediction: Prediction
     predictions: [Prediction!]!
+      competition: Competition!
   }
 
   type Standing {
     user: User!
     rank: Int
+  }
+  enum GroupStatus {
+      DRAFT
+      LIVE
+      STOPPED
   }
 
   type Group {
@@ -56,6 +62,7 @@ module.exports = gql`
     author: User!
     participants: [User!]!
     name: String!
+      status: GroupStatus
     standings: [Standing]
     createdAt:String!
   }
@@ -100,8 +107,8 @@ module.exports = gql`
     team: Team!
       
     fixture(fixtureId: String!): Fixture!
-    fixtures(status: FixtureStatus, groupId:String, start:String, end:String, matchDay:Int): [Fixture!]!
-    """
+    fixtures(first:Int, offset:Int, status: [FixtureStatus!], groupId:String, start:String, end:String, matchDay:Int): [Fixture!]!
+      """
     Resolves the last matchDay entered
     """
     currentMatchDay: Int!

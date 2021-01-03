@@ -118,7 +118,7 @@ exports.onDayEnd = functions.https.onRequest(async (req, res) => {
         fixture,
         prediction
       );
-      ref.push(resultAttribute);
+     ref.push(resultAttribute);
     });
   });
   res.send("ok");

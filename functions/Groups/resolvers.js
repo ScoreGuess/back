@@ -2,7 +2,7 @@ const {save, find, findOne, findOneAndUpdate} = require("../utils/db");
 const admin = require("firebase-admin");
 const moment = require('moment')
 
-const create = async (_, resource, {userId}) => {
+const create = async (_, resource, { userId }) => {
     return await save("groups", {
         ...resource,
         participants: [userId],

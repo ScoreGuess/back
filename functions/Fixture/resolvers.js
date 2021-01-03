@@ -1,5 +1,5 @@
 const {save, find, findOne, findOneAndUpdate} = require("../utils/db");
-const moment =require('moment');
+const moment = require('moment');
 const fixtureRead = async (_, {fixtureId, userId}) => {
     return await findOne("fixtures", fixtureId);
 };
@@ -18,16 +18,17 @@ const currentMatchDay = async () => {
     );
     return currentMatchDay;
 };
-const fixtureSearch = async (_, {matchDay, start, end, status, groupId}) => {
+const fixtureSearch = async (_, {first = 20, offset = 0, matchDay, start, end, status, groupId}) => {
     const fixtures = await find("fixtures");
-
+    console.log(status)
     return fixtures
         .map(fixture => ({...fixture, groupId}))
         .filter((fixture) => matchDay == null || fixture.matchDay === matchDay)
-        .filter(fixture => status == null || fixture.status === status)
+        .filter(fixture => status == null ||status.includes(fixture.status))
         .filter((fixture) => start == null || moment(fixture.startDate, 'YYYY-MM-DDTHH:mm').isAfter(start, "YYYY-MM-DD"))
         .filter((fixture) => end == null || moment(fixture.startDate, 'YYYY-MM-DDTHH:mm').isBefore(end, "YYYY-MM-DD"))
-
+        .sort((a, b) => b.startDate.localeCompare(a.startDate))
+        .filter((_, i) => i >= offset && i < offset + first)
 };
 
 const fixtureCreate = async (_, fixture) => {
@@ -85,6 +86,11 @@ module.exports = {
     updateStartDate,
     fixtureCreate,
     Fixture: {
+        competition: async (fixture) => {
+            const competition =
+                await findOne('competitions', fixture.competition)
+            return competition
+        },
         prediction: async (fixture, _, {userId}) =>
             await findOne(`users/${userId}/predictions`, fixture.id),
         homeTeam: async (fixture) => await findOne("teams", fixture.homeTeamId),
