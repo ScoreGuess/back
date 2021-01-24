@@ -24,6 +24,7 @@
     "firebase-functions": "^3.6.1",
     "graphql": "^15.3.0",
     "moment": "^2.27.0",
+    "puppeteer": "^5.5.0",
     "shortid": "^2.2.15"
   },
   "devDependencies": {
