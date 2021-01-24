@@ -137,13 +137,11 @@ const getDataFromUrl = async (browser, url) => {
 }
 
 exports.scrap = functions.runWith({
-    timeoutSeconds: 120,
+    timeoutSeconds: 300,
     memory: "2GB"
 }).https.onRequest(async (req, res) => {
     const url = 'https://www.ligue1.fr/calendrier-resultats'
-    const width = 1024;
-    const height = 768;
-    const fullPage = false
+
     const browser = await puppeteer.launch({
         args: ["--no-sandbox"]
     });
