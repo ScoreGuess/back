@@ -9,10 +9,13 @@ const resolvers = require("./resolvers");
 const onFixtureWrite = require("./Fixture/index");
 const { find } = require("./utils/db");
 const moment = require("moment");
+const puppeteer = require("puppeteer");
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
   databaseURL: "https://scoreguess-17a79.firebaseio.com",
-});
+})
+
+
 
 const app = express();
 
@@ -83,11 +86,7 @@ const computeResultAttribute = (userId, prediction, fixture) => {
   return "WRONG_RESULT";
 };
 
-const filterStartedDuringLastWeek = (fixture) => {
-  const lastWeek = moment().subtract(1, "week");
-  const now = moment();
-  return moment(fixture.startDate, "DD-MM-YYYYTHH:mm").isBetween(lastWeek, now);
-};
+
 const filterFinished = (fixture) => fixture.status === "FINISHED";
 
 exports.onDayEnd = functions.https.onRequest(async (req, res) => {
@@ -123,3 +122,64 @@ exports.onDayEnd = functions.https.onRequest(async (req, res) => {
   });
   res.send("ok");
 });
+
+
+
+
+const getDataFromUrl = async (browser, url) => {
+  const page = await browser.newPage()
+  await page.setDefaultNavigationTimeout(0);
+
+  await page.goto(url, { waitUntil: "networkidle2" });
+  console.log(`${url}: evaluating the fixture hero...`)
+
+  return page.evaluate(() => {
+    let hero = document.querySelector('.hero').innerText
+    return { hero }
+  })
+}
+
+exports.scrap = functions.runWith({
+  timeoutSeconds: 120,
+  memory: "2GB"
+}).https.onRequest(async (req, res)=> {
+  const url = 'https://www.ligue1.fr/calendrier-resultats'
+  const width =  1024;
+  const height =  768;
+  const fullPage = false
+  const browser = await puppeteer.launch({
+    args: ["--no-sandbox"]
+  });
+  const page = await browser.newPage();
+  await page.goto(url, { waitUntil: "networkidle2" });
+  const links = await page.evaluate(() =>
+      [...document.querySelectorAll('.match-result .discussion a')].map(link => link.href),
+  )
+  console.log(links)
+  const result = await Promise.all(links.map(link => getDataFromUrl(browser, link)))
+
+  await browser.close();
+
+  return res.send(result)
+})
+
+/*
+exports.sendReminders = functions.https.onRequest(async (req, res)=>{
+  console.log("hello")
+  const messaging = admin.messaging();
+  messaging.sendToTopic('REMINDERS',{
+    notification:{
+      title:"19eme journée",
+      body:"vas-y franky"
+    }
+  })
+  messaging.send({
+     token: "e3XCzKMVpUDkoZyDFCwLlq:APA91bGZ74YlHgR_kf2z03j1oYfR9kIsxRxxVY03SC4060Jc9xpGnd73yXlm6ZPUiCCDW4Q-EBrTg9O-ykl4C3Vik-KODiFB-_VZugcyz5Wy9kKgt9g4Dci4w8snXi-r5lVSMuPzHZWV",
+     notification:{
+       title:"19eme journée",
+       body:"vas-y franky"
+     }
+   })
+  res.send("ok");
+})
+*/
