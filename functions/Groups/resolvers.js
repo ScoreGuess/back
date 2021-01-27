@@ -12,11 +12,15 @@ const create = async (_, resource, { userId }) => {
 };
 const join = async (_, {groupId, userId}, context) => {
     userId = userId == null ? context.userId : userId
+    const updatedParticipants =  [...group.participants, userId].filter(
+        (elem, pos, arr) => arr.indexOf(elem) === pos
+    )
     return await findOneAndUpdate("groups", groupId, (group) => ({
         ...group,
-        participants: [...group.participants, userId].filter(
-            (elem, pos, arr) => arr.indexOf(elem) === pos
-        ),
+        // proxy value for length
+        // we could add leader and stuff like this
+        size: updatedParticipants.length,
+        participants: updatedParticipants
     }));
 };
 

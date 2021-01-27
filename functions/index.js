@@ -8,7 +8,6 @@ const typeDefs = require("./schema");
 const resolvers = require("./resolvers");
 const onFixtureWrite = require("./Fixture/index");
 const {find} = require("./utils/db");
-const moment = require("moment");
 const puppeteer = require("puppeteer");
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
