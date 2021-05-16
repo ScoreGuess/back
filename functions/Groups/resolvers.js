@@ -45,6 +45,11 @@ module.exports = {
             const user = await admin.auth().getUser(group.author)
             return {...user, id: user.uid}
         },
+        rankings: async (group) => {
+            return Object.entries(group.rankings).map(([id, score]) => {
+                return ({ score, userId: id})
+            })
+        },
         participants: async (group) => {
             // c.f. https://firebase.google.com/docs/auth/admin/manage-users?authuser=0#retrieve_user_data
             const {users} = await admin

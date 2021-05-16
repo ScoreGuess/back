@@ -46,7 +46,10 @@ module.exports = gql`
         predictions: [Prediction!]!
         competition: Competition!
     }
-
+    type Ranking {
+        userId: String!,
+        score: Int!
+    }
     type Standing {
         user: User!
         rank: Int
@@ -64,7 +67,7 @@ module.exports = gql`
         name: String!
         status: GroupStatus
         size: Int
-        standings: [Standing]
+         rankings:[Ranking!]!
         createdAt:String!
     }
 
@@ -107,8 +110,8 @@ module.exports = gql`
         teams: [Team!]!
         team: Team!
 
-        fixture(fixtureId: String!): Fixture!
-        fixtures(first:Int, offset:Int, status: [FixtureStatus!], groupId:String, start:String, end:String, matchDay:Int): [Fixture!]!
+        fixture(fixtureId: String!, groupId: String): Fixture!
+        fixtures(first:Int, after:String,offset:Int, status: [FixtureStatus!], groupId:String, start:String, end:String, matchDay:Int): [Fixture!]!
         """
         Resolves the last matchDay entered
         """

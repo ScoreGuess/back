@@ -93,34 +93,46 @@ const onCreate = async (fixture) => {
       parent: queuePath,
       task: finishedTask,
     });
-    await findOneAndUpdate("fixtures", fixture.id, (resource) => ({
+
+    const ref = admin.firestore().collection("fixtures");
+    let doc = await ref.doc(fixture.id);
+    await doc.update({
+      _inProgressTaskName: inProgressRequest.name,
+      _finishedTaskName: finishedRequest.name,
+    });
+    /*  await findOneAndUpdate("fixtures", fixture.id, (resource) => ({
       ...resource,
       _inProgressTaskName: inProgressRequest.name,
       _finishedTaskName: finishedRequest.name,
-    }));
+    }));*/
   } catch (e) {
     console.log(e);
   }
 };
-
-// create cloud tasks to call updateStatus for fixture when it starts or it ends
-module.exports = functions.database
-  .ref("/fixtures/{fixtureId}")
-  .onWrite(async (change, context) => {
+module.exports = functions.firestore
+  .document("/fixtures/{fixtureId}")
+  .onWrite((change, context) => {
     // create new tasks
-    if (!change.before.exists()) {
-      return onCreate(change.after.val());
+    if (!change.before.exists) {
+      console.log("coucou");
+
+      return onCreate({
+        ...change.after.data(),
+        id: change.after.id,
+      });
     }
 
     // remove previous tasks
-    if (!change.after.exists()) {
-      return onDelete(change.before.val());
+    if (!change.after.exists) {
+      return onDelete(change.before.data());
     }
-
-    const before = change.before.val();
-    const after = change.after.val();
+    const before = change.before.data();
+    const after = change.after.data();
     if (before.startDate !== after.startDate) {
-      return onCreate(after);
+      return onCreate({
+        ...change.after.data(),
+        id: change.after.id,
+      });
     }
 
     return null;

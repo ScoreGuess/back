@@ -20,7 +20,14 @@ module.exports = {
             }
             return null
         },
-        fixture: async (prediction) =>
-            await findOne("fixtures", prediction.fixtureId),
+        fixture: async (prediction) =>{
+
+          const fixture =  await findOne("fixtures", prediction.fixtureId)
+            if(fixture ==null){
+                console.log(prediction, "is null")
+            }
+            return fixture
+
+        }
     },
 };
